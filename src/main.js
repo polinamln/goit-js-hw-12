@@ -4,6 +4,11 @@ import "izitoast/dist/css/iziToast.min.css";
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 
+import axios from 'axios';
+
+
+
+
 const form = document.querySelector('.body-elements')
 const imagesList = document.querySelector('.images-list');
 
@@ -18,7 +23,10 @@ url.searchParams.append('orientation', 'horizontal')
 url.searchParams.append('safesearch', 'true')
 url.searchParams.append('q', 'cat')
 
+
+
 loader.style.display = 'none';
+
 
 form.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -34,17 +42,14 @@ form.addEventListener('submit', (event) => {
     event.currentTarget.reset()
 })
 
+
 function getImage(quary) {
-    
     url.searchParams.set('q', quary);
-    return fetch(url)
+    return axios.get(url)
         .then((res) => {
-            if (res.ok) {
-                return res.json()
-            } else {
-                throw new Error('Request is ot OK.')
-            }
-        }).catch(error => {
+            return res.data
+        })
+        .catch(error => {
             iziToast.error({
                     position: 'center',
                     title: '',
@@ -53,16 +58,19 @@ function getImage(quary) {
         })
 };
 
+
 function renderImages(quary) {
     getImage(quary)
         .then(image => {
             imagesList.insertAdjacentHTML("afterbegin", createImageHTML(image))
+
             lightbox.refresh()
+
             if (image.hits.length === 0) {
                 iziToast.error({
                     position: 'center',
                     title: '',
-                    message: 'Sorry, there are no images matching your search query. Please try again!',
+                    message: 'Error. Please try again!',
 });
             }
         })
@@ -70,11 +78,12 @@ function renderImages(quary) {
         iziToast.error({
                     position: 'center',
                     title: '',
-                    message: 'Sorry, there are no images matching your search query. Please try again!',
+                    message: 'Error. Please try again!',
 });
     })
     
 };
+
 
 function createImageHTML(image) {
     const imagesHTML = image.hits.reduce((html, hit) => {
@@ -110,6 +119,7 @@ function createImageHTML(image) {
 
     return imagesHTML;
 }
+
 
 const lightbox = new SimpleLightbox('.gallery a', {
         captionsData: "alt",
