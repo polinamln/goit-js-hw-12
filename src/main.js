@@ -9,7 +9,7 @@ const imagesList = document.querySelector('.images-list');
 
 const loader = document.querySelector('.loader')
 
-const BASE_URL = ''
+const BASE_URL = 'https://pixabay.com/api/'
 const API_KEY = "27271649-0bf2f3b05194a9267cfa0a660"
 const url = new URL(BASE_URL);
 url.searchParams.append("key", API_KEY)
