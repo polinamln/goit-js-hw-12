@@ -14,6 +14,8 @@ const imagesList = document.querySelector('.images-list');
 
 const loader = document.querySelector('.loader')
 
+const loadBtn = document.querySelector('.load-more-btn')
+
 const BASE_URL = 'https://pixabay.com/api/'
 const API_KEY = "27271649-0bf2f3b05194a9267cfa0a660"
 const url = new URL(BASE_URL);
@@ -21,12 +23,24 @@ url.searchParams.append("key", API_KEY)
 url.searchParams.append('image_type', 'photo')
 url.searchParams.append('orientation', 'horizontal')
 url.searchParams.append('safesearch', 'true')
-url.searchParams.append('q', 'cat')
+url.searchParams.append('page', '1')
+url.searchParams.append('per_page', '40')
 
 
 
 loader.style.display = 'none';
+loadBtn.style.display = 'none';
 
+const scrollPage = () => {
+     const cardEl = document.querySelector('.card');
+                const cardRect = cardEl.getBoundingClientRect();
+                const cardHeight = cardRect.height;
+
+                window.scrollTo({
+                    top: window.scrollY + cardHeight * 2,
+                    behavior: 'smooth',
+                });
+}
 
 form.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -38,9 +52,20 @@ form.addEventListener('submit', (event) => {
     const query = event.currentTarget.elements.inputValue.value;
 
     renderImages(query);
+    
 
     event.currentTarget.reset()
 })
+
+loadBtn.addEventListener('click', () => {
+        const query = form.elements.inputValue.value;
+
+    renderImages(query);
+
+    setTimeout(() => {
+        scrollPage()
+    }, 100)
+        });
 
 
 function getImage(quary) {
@@ -59,12 +84,17 @@ function getImage(quary) {
 };
 
 
-function renderImages(quary) {
-    getImage(quary)
-        .then(image => {
-            imagesList.insertAdjacentHTML("afterbegin", createImageHTML(image))
+async function renderImages(quary) {
+    let page = 1;
+     
+    try {
+        const image = await getImage(quary);
+            
+            imagesList.insertAdjacentHTML("beforeend", createImageHTML(image))
 
             lightbox.refresh()
+
+            page += 1
 
             if (image.hits.length === 0) {
                 iziToast.error({
@@ -73,16 +103,30 @@ function renderImages(quary) {
                     message: 'Error. Please try again!',
 });
             }
-        })
-        .catch(error => {
+
+            if (page >= Math.ceil(image.totalHits / 40)) {
+                iziToast.info({
+                        position: 'center',
+                        title: '',
+                        message: "We're sorry, but you've reached the end of search results.",
+                });
+                loadBtn.style.display = 'none';
+            } 
+        }
+        catch(error)  {
         iziToast.error({
                     position: 'center',
                     title: '',
                     message: 'Error. Please try again!',
 });
-    })
+        }
     
+    loadBtn.style.display = 'block';
+    loader.style.display = 'none';
+
 };
+
+
 
 
 function createImageHTML(image) {
@@ -118,7 +162,12 @@ function createImageHTML(image) {
     }, '');
 
     return imagesHTML;
-}
+};
+
+
+
+
+
 
 
 const lightbox = new SimpleLightbox('.gallery a', {
