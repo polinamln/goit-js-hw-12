@@ -42,7 +42,7 @@ const scrollPage = () => {
                 });
 }
 
-form.addEventListener('submit', (event) => {
+form.addEventListener('submit', async (event) => {
     event.preventDefault();
 
     loader.style.display = 'block';
@@ -51,7 +51,15 @@ form.addEventListener('submit', (event) => {
 
     const query = event.currentTarget.elements.inputValue.value;
 
-    renderImages(query);
+    if (query !== '') {
+            await renderImages(query);
+    } else {
+        iziToast.info({
+                    position: 'center',
+                    title: '',
+                    message: 'Please fill in the input field',
+});
+    }
     
 
     event.currentTarget.reset()
@@ -90,7 +98,7 @@ async function renderImages(quary) {
     try {
         const image = await getImage(quary);
             
-            imagesList.insertAdjacentHTML("beforeend", createImageHTML(image))
+             imagesList.insertAdjacentHTML("beforeend", createImageHTML(image))
 
             lightbox.refresh()
 
@@ -102,8 +110,8 @@ async function renderImages(quary) {
                     title: '',
                     message: 'Error. Please try again!',
 });
-            }
-
+        }
+        
             if (page >= Math.ceil(image.totalHits / 40)) {
                 iziToast.info({
                         position: 'center',
@@ -111,7 +119,8 @@ async function renderImages(quary) {
                         message: "We're sorry, but you've reached the end of search results.",
                 });
                 loadBtn.style.display = 'none';
-            } 
+        } 
+        
         }
         catch(error)  {
         iziToast.error({
@@ -120,6 +129,7 @@ async function renderImages(quary) {
                     message: 'Error. Please try again!',
 });
         }
+    
     
     loadBtn.style.display = 'block';
     loader.style.display = 'none';
