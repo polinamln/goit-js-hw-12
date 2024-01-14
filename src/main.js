@@ -65,14 +65,13 @@ form.addEventListener('submit', async (event) => {
     event.currentTarget.reset()
 })
 
-loadBtn.addEventListener('click', () => {
+loadBtn.addEventListener('click', async () => {
         const query = form.elements.inputValue.value;
 
-    renderImages(query);
+        await renderImages(query);
 
-    setTimeout(() => {
-        scrollPage()
-    }, 100)
+        await scrollPage()
+
         });
 
 
