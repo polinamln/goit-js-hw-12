@@ -49,7 +49,7 @@ form.addEventListener('submit', async (event) => {
     
     imagesList.innerHTML = '';
 
-    const query = event.currentTarget.elements.inputValue.value;
+    const query = event.currentTarget.elements.inputValue.value.trim();
 
     if (query !== '') {
             await renderImages(query);
@@ -58,10 +58,10 @@ form.addEventListener('submit', async (event) => {
                     position: 'center',
                     title: '',
                     message: 'Please fill in the input field',
-});
+        });
+        loader.style.display = 'none';
     }
     
-
     event.currentTarget.reset()
 })
 
@@ -75,25 +75,27 @@ loadBtn.addEventListener('click', async () => {
         });
 
 
-function getImage(quary) {
-    url.searchParams.set('q', quary);
-    return axios.get(url)
-        .then((res) => {
-            return res.data
-        })
-        .catch(error => {
-            iziToast.error({
-                    position: 'center',
-                    title: '',
-                    message: 'Sorry, there are no images matching your search query. Please try again!',
-});
-        })
+
+async function getImage(query) {
+    url.searchParams.set('q', query);
+    try {
+        const res = await axios.get(url);
+        return res.data;
+    } catch (error) {
+        iziToast.error({
+            position: 'center',
+            title: '',
+            message: 'Sorry, there are no images matching your search query. Please try again!',
+        });
+        throw error;
+    }
 };
+
+
 
 
 async function renderImages(quary) {
     let page = 1;
-     
     try {
         const image = await getImage(quary);
             
@@ -107,17 +109,16 @@ async function renderImages(quary) {
                 iziToast.error({
                     position: 'center',
                     title: '',
-                    message: 'Error. Please try again!',
-});
+                    message: 'Error. Please try again!',});
         }
-        
+
             if (page >= Math.ceil(image.totalHits / 40)) {
                 iziToast.info({
                         position: 'center',
                         title: '',
-                        message: "We're sorry, but you've reached the end of search results.",
-                });
+                    message: "We're sorry, but you've reached the end of search results.",});
                 loadBtn.style.display = 'none';
+                return
         } 
         
         }
@@ -125,14 +126,15 @@ async function renderImages(quary) {
         iziToast.error({
                     position: 'center',
                     title: '',
-                    message: 'Error. Please try again!',
-});
-        }
+                    message: 'Error. Please try again!',});
+        loadBtn.style.display = 'none';
+    } 
+    
     
     
     loadBtn.style.display = 'block';
     loader.style.display = 'none';
-
+    
 };
 
 
@@ -172,11 +174,6 @@ function createImageHTML(image) {
 
     return imagesHTML;
 };
-
-
-
-
-
 
 
 const lightbox = new SimpleLightbox('.gallery a', {
