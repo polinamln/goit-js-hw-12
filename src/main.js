@@ -70,7 +70,7 @@ loadBtn.addEventListener('click', async () => {
 
         await renderImages(query);
 
-        await scrollPage()
+        scrollPage()
 
         });
 
@@ -87,52 +87,52 @@ async function getImage(query) {
             title: '',
             message: 'Sorry, there are no images matching your search query. Please try again!',
         });
+        loadBtn.style.display = 'none';
         throw error;
     }
 };
 
 
-
+let page = 1;
 
 async function renderImages(quary) {
-    let page = 1;
+    
+    let isLastPage = false;
+
     try {
         const image = await getImage(quary);
             
              imagesList.insertAdjacentHTML("beforeend", createImageHTML(image))
 
-            lightbox.refresh()
-
+        lightbox.refresh()
+        
             page += 1
 
-            if (image.hits.length === 0) {
-                iziToast.error({
-                    position: 'center',
-                    title: '',
-                    message: 'Error. Please try again!',});
+        if (image.hits.length === 0) {
+                throw new Error
         }
 
-            if (page >= Math.ceil(image.totalHits / 40)) {
+        if (page >= Math.ceil(image.totalHits / 40)) {
+            isLastPage = true;
                 iziToast.info({
                         position: 'center',
                         title: '',
                     message: "We're sorry, but you've reached the end of search results.",});
                 loadBtn.style.display = 'none';
-                return
         } 
-        
+
+        if (isLastPage) {
+            return []
+        }
+        loadBtn.style.display = 'block';
         }
         catch(error)  {
         iziToast.error({
                     position: 'center',
                     title: '',
-                    message: 'Error. Please try again!',});
-        loadBtn.style.display = 'none';
+                    message: 'Error! Enter a valid request.',});
+        
     } 
-    
-    
-    
-    loadBtn.style.display = 'block';
     loader.style.display = 'none';
     
 };
