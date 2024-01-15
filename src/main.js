@@ -100,7 +100,7 @@ async function renderImages(quary) {
     let isLastPage = false;
 
     try {
-        const image = await getImage(quary);
+        const image = await getImage(quary, {page});
             
              imagesList.insertAdjacentHTML("beforeend", createImageHTML(image))
 
