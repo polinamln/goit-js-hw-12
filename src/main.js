@@ -18,18 +18,28 @@ const loadBtn = document.querySelector('.load-more-btn')
 
 const BASE_URL = 'https://pixabay.com/api/'
 const API_KEY = "27271649-0bf2f3b05194a9267cfa0a660"
+
 const url = new URL(BASE_URL);
 url.searchParams.append("key", API_KEY)
 url.searchParams.append('image_type', 'photo')
 url.searchParams.append('orientation', 'horizontal')
 url.searchParams.append('safesearch', 'true')
-url.searchParams.append('page', '1')
 url.searchParams.append('per_page', '40')
 
-
+// const url = axios.create({
+//     baseURL: "https://pixabay.com/api/",
+//     params: {
+//         apiKey: "27271649-0bf2f3b05194a9267cfa0a660",
+//         image_type: "photo",
+//         orientation: "horizontal",
+//         safesearch: "true",
+//         per_page: "40"
+//     }
+// })
 
 loader.style.display = 'none';
 loadBtn.style.display = 'none';
+let page = 1;
 
 const scrollPage = () => {
      const cardEl = document.querySelector('.card');
@@ -44,6 +54,8 @@ const scrollPage = () => {
 
 form.addEventListener('submit', async (event) => {
     event.preventDefault();
+
+    page = 1;
 
     loader.style.display = 'block';
     
@@ -76,8 +88,11 @@ loadBtn.addEventListener('click', async () => {
 
 
 
-async function getImage(query) {
+async function getImage(query, page) {
+
     url.searchParams.set('q', query);
+    url.searchParams.set('page', page);
+
     try {
         const res = await axios.get(url);
         return res.data;
@@ -93,14 +108,12 @@ async function getImage(query) {
 };
 
 
-let page = 1;
-
 async function renderImages(quary) {
     
     let isLastPage = false;
 
     try {
-        const image = await getImage(quary, {page});
+        const image = await getImage(quary, page);
             
              imagesList.insertAdjacentHTML("beforeend", createImageHTML(image))
 
@@ -118,7 +131,9 @@ async function renderImages(quary) {
                         position: 'center',
                         title: '',
                     message: "We're sorry, but you've reached the end of search results.",});
-                loadBtn.style.display = 'none';
+            loadBtn.style.display = 'none';
+            loader.style.display = 'none';
+
         } 
 
         if (isLastPage) {
