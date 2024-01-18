@@ -127,7 +127,7 @@ async function renderImages(quary) {
                 throw new Error
         }
 
-        const lastPage = Math.ceil(image.totalHits / 40)
+        const lastPage = Math.ceil(image.totalHits / image.per_page)
 
         if (lastPage === page) {
             isLastPage = true;
