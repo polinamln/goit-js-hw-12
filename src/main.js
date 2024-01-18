@@ -74,7 +74,6 @@ form.addEventListener('submit', async (event) => {
         loader.style.display = 'none';
     }
     
-    event.currentTarget.reset()
 })
 
 loadBtn.addEventListener('click', async () => {
@@ -114,6 +113,9 @@ async function renderImages(quary) {
     
     let isLastPage = false;
 
+    const per_page = url.searchParams.get('per_page')
+    const totalHits = url.searchParams.get('totalHits')
+
     try {
         const image = await getImage(quary, page);
             
@@ -127,7 +129,7 @@ async function renderImages(quary) {
                 throw new Error
         }
 
-        const lastPage = Math.ceil(image.totalHits / image.per_page)
+        const lastPage = Math.ceil(totalHits / per_page)
 
         if (lastPage === page) {
             isLastPage = true;
@@ -149,11 +151,13 @@ async function renderImages(quary) {
         iziToast.error({
                     position: 'center',
                     title: '',
-                    message: "We're sorry, but you've reached the end of search results.",});
+            message: "We're sorry, but you've reached the end of search results.",
+        });
+        loadBtn.style.display = 'none';
         
-    } 
-    loader.style.display = 'none';
-    
+    } finally {
+        loader.style.display = 'none';
+    }    
 };
 
 
