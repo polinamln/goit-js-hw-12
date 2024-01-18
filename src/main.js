@@ -78,7 +78,7 @@ form.addEventListener('submit', async (event) => {
 })
 
 loadBtn.addEventListener('click', async () => {
-        const query = form.elements.inputValue.value;
+        const query = form.elements.inputValue.value.trim();
 
         await renderImages(query);
 
@@ -88,10 +88,11 @@ loadBtn.addEventListener('click', async () => {
 
 
 
-async function getImage(query, page) {
+async function getImage(quary, page) {
 
-    url.searchParams.set('q', query);
+    url.searchParams.set('q', quary);
     url.searchParams.set('page', page);
+    
 
     try {
         const res = await axios.get(url);
@@ -105,6 +106,7 @@ async function getImage(query, page) {
         loadBtn.style.display = 'none';
         throw error;
     }
+    
 };
 
 
@@ -125,7 +127,9 @@ async function renderImages(quary) {
                 throw new Error
         }
 
-        if (page >= Math.ceil(image.totalHits / 40)) {
+        const lastPage = Math.ceil(image.totalHits / 40)
+
+        if (lastPage === page) {
             isLastPage = true;
                 iziToast.info({
                         position: 'center',
@@ -133,7 +137,7 @@ async function renderImages(quary) {
                     message: "We're sorry, but you've reached the end of search results.",});
             loadBtn.style.display = 'none';
             loader.style.display = 'none';
-
+ 
         } 
 
         if (isLastPage) {
@@ -145,7 +149,7 @@ async function renderImages(quary) {
         iziToast.error({
                     position: 'center',
                     title: '',
-                    message: 'Error! Enter a valid request.',});
+                    message: "We're sorry, but you've reached the end of search results.",});
         
     } 
     loader.style.display = 'none';
