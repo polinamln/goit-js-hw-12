@@ -72,6 +72,8 @@ form.addEventListener('submit', async (event) => {
                     message: 'Please fill in the input field',
         });
         loader.style.display = 'none';
+        form.elements.inputValue.value = ''
+
     }
     
 })
@@ -154,6 +156,8 @@ async function renderImages(quary) {
             message: "We're sorry, but you've reached the end of search results.",
         });
         loadBtn.style.display = 'none';
+        form.elements.inputValue.value = ''
+
         
     } finally {
         loader.style.display = 'none';
