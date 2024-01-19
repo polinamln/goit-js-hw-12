@@ -68,17 +68,6 @@ form.addEventListener('submit', async (event) => {
     if (query !== '') {
         await renderImages(query); 
 
-                if (image.hits.length === 0) {
-            isLastPage = true;
-                iziToast.info({
-                        position: 'center',
-                        title: '',
-                    message: "We're sorry, but you've reached the end of search results.",});
-            loadBtn.style.display = 'none';
-            loader.style.display = 'none';
-            form.elements.inputValue.value = ''
-        } 
-
     } else {
         iziToast.info({
                     position: 'center',
@@ -138,7 +127,9 @@ async function renderImages(quary) {
             page += 1
 
 
-        const lastPage = [Math.ceil(image.totalHits / per_page)];
+        const lastPage = Math.ceil(image.totalHits / per_page);
+
+        
 
         if (lastPage === page || image.hits.length === 0) {
             isLastPage = true;
