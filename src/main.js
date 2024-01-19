@@ -98,14 +98,13 @@ async function getImage(quary, page) {
 
     try {
         const res = await axios.get(url);
+        
+        if (res.data.totalHits === 0) {
+            throw new Error
+        }
         return res.data;
+        
     } catch (error) {
-        iziToast.error({
-            position: 'center',
-            title: '',
-            message: 'Sorry, there are no images matching your search query. Please try again!',
-        });
-        loadBtn.style.display = 'none';
         throw error;
     }
     
@@ -113,7 +112,6 @@ async function getImage(quary, page) {
 
 
 async function renderImages(quary) {
-    const totalHits = url.searchParams.get('totalHits')
     const per_page = url.searchParams.get('per_page');
     let isLastPage = false;
         
@@ -129,9 +127,8 @@ async function renderImages(quary) {
 
         const lastPage = Math.ceil(image.totalHits / per_page);
 
-        
 
-        if (lastPage === page || image.hits.length === 0) {
+        if (lastPage < page || image.hits.length === 0) {
             isLastPage = true;
                 iziToast.info({
                         position: 'center',
