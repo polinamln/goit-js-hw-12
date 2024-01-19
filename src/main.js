@@ -37,6 +37,8 @@ url.searchParams.append('per_page', '40')
 //     }
 // })
 
+
+
 loader.style.display = 'none';
 loadBtn.style.display = 'none';
 let page = 1;
@@ -64,7 +66,7 @@ form.addEventListener('submit', async (event) => {
     const query = event.currentTarget.elements.inputValue.value.trim();
 
     if (query !== '') {
-            await renderImages(query);
+            await renderImages(query); 
     } else {
         iziToast.info({
                     position: 'center',
@@ -73,9 +75,7 @@ form.addEventListener('submit', async (event) => {
         });
         loader.style.display = 'none';
         form.elements.inputValue.value = ''
-
     }
-    
 })
 
 loadBtn.addEventListener('click', async () => {
@@ -112,12 +112,10 @@ async function getImage(quary, page) {
 
 
 async function renderImages(quary) {
-    
-    let isLastPage = false;
-
-    const per_page = url.searchParams.get('per_page')
     const totalHits = url.searchParams.get('totalHits')
-
+    const per_page = url.searchParams.get('per_page');
+    let isLastPage = false;
+        
     try {
         const image = await getImage(quary, page);
             
@@ -127,13 +125,10 @@ async function renderImages(quary) {
         
             page += 1
 
-        if (image.hits.length === 0) {
-                throw new Error
-        }
 
-        const lastPage = Math.ceil(totalHits / per_page)
+        const lastPage = [Math.ceil(image.totalHits / per_page)];
 
-        if (lastPage === page) {
+        if (lastPage === page || image.hits.length === 0) {
             isLastPage = true;
                 iziToast.info({
                         position: 'center',
@@ -141,10 +136,10 @@ async function renderImages(quary) {
                     message: "We're sorry, but you've reached the end of search results.",});
             loadBtn.style.display = 'none';
             loader.style.display = 'none';
- 
         } 
 
         if (isLastPage) {
+            loadBtn.style.display = 'none';
             return []
         }
         loadBtn.style.display = 'block';
@@ -153,19 +148,15 @@ async function renderImages(quary) {
         iziToast.error({
                     position: 'center',
                     title: '',
-            message: "We're sorry, but you've reached the end of search results.",
+            message: "Sorry, there are no images matching your search query. Please try again!",
         });
         loadBtn.style.display = 'none';
         form.elements.inputValue.value = ''
 
-        
     } finally {
         loader.style.display = 'none';
     }    
 };
-
-
-
 
 function createImageHTML(image) {
     const imagesHTML = image.hits.reduce((html, hit) => {
