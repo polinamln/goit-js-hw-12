@@ -136,6 +136,7 @@ async function renderImages(quary) {
                     message: "We're sorry, but you've reached the end of search results.",});
             loadBtn.style.display = 'none';
             loader.style.display = 'none';
+            form.elements.inputValue.value = ''
         } 
 
         if (isLastPage) {
